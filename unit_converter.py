@@ -18,7 +18,7 @@ def convert_length(val, from_unit, to_unit):
         "Inch": 0.0254,
         "Nautical Mile": 1852
     }
-    return val * (conversion_factors[from_unit] / conversion_factors[to_unit]) if from_unit in conversion_factors and to_unit in conversion_factors else val
+    return val * (conversion_factors[from_unit] / conversion_factors[to_unit])
 
 def convert_weight(val, from_unit, to_unit):
     conversion_factors = {
@@ -27,7 +27,7 @@ def convert_weight(val, from_unit, to_unit):
         "Gram": 1000,
         "Microgram": 1e6
     }
-    return val * (conversion_factors[to_unit] / conversion_factors[from_unit]) if from_unit in conversion_factors and to_unit in conversion_factors else val
+    return val * (conversion_factors[to_unit] / conversion_factors[from_unit])
 
 def convert_temp(val, from_unit, to_unit):
     if from_unit == "Celsius" and to_unit == "Fahrenheit":
@@ -47,14 +47,12 @@ def convert_temp(val, from_unit, to_unit):
 # App Title
 st.title("🔄 Unit Converter")
 
-# Conversion Category
-category = st.selectbox("Select Conversion Type", ["Length", "Weight", "Temperature"])
+# Sidebar for Category Selection
+st.sidebar.header("⚙️ Settings")
+category = st.sidebar.radio("Select Conversion Type", ["Length", "Weight", "Temperature"])
 
-# Length Conversion Units
-length_units = [
-    "Kilometer", "Meter", "Centimeter", "Millimeter", "Micrometer", "Nanometer", 
-    "Mile", "Yard", "Foot", "Inch", "Nautical Mile"
-]
+# Available units based on category
+length_units = ["Kilometer", "Meter", "Centimeter", "Millimeter", "Micrometer", "Nanometer", "Mile", "Yard", "Foot", "Inch", "Nautical Mile"]
 weight_units = ["Kilograms", "Pounds", "Gram", "Microgram"]
 temp_units = ["Celsius", "Fahrenheit", "Kelvin"]
 
@@ -65,24 +63,30 @@ elif category == "Weight":
 else:
     available_units = temp_units
 
-# Single Conversion
+# Main Conversion Inputs
+st.markdown("### 🛠️ Conversion Panel")
 col1, col2 = st.columns(2)
 with col1:
-    unit_from = st.selectbox("From", available_units)
+    unit_from = st.selectbox("Convert From", available_units)
 with col2:
-    unit_to = st.selectbox("To", available_units)
+    unit_to = st.selectbox("Convert To", available_units)
 
-value = st.number_input("Enter Value", format="%.2f") if category == "Temperature" else st.number_input("Enter Value", min_value=0.0, format="%.2f")
+# Value Input
+value = st.number_input("🔢 Enter Value", format="%.2f")
 
-if st.button("Convert"):
-    if category == "Length":
-        result = convert_length(value, unit_from, unit_to)
-    elif category == "Weight":
-        result = convert_weight(value, unit_from, unit_to)
+# Convert Button with Result Display
+if st.button("🚀 Convert Now", use_container_width=True):
+    if unit_from == unit_to:
+        st.warning("⚠️ Same units selected! Please choose different units.")
     else:
-        result = convert_temp(value, unit_from, unit_to)
+        if category == "Length":
+            result = convert_length(value, unit_from, unit_to)
+        elif category == "Weight":
+            result = convert_weight(value, unit_from, unit_to)
+        else:
+            result = convert_temp(value, unit_from, unit_to)
 
-    st.success(f"Converted Value: {result:.6f} {unit_to}")
+        st.success(f"✅ Converted Value: {result:.6f} {unit_to}")
 
 # Footer
 st.markdown("---")
